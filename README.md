@@ -1,5 +1,3 @@
-<p align="center"><img src="assets/header.svg" alt="Marketing System. Data, integrations and operations." width="100%"></p>
-
 # Marketing System
 
 **Внутреннее веб-приложение для сбора маркетинговых данных и анализа кампаний.**
