@@ -1,10 +1,8 @@
 flowchart LR
-    U[Владелец] --> UI[React / Vite]
-    UI --> API[Node.js HTTP API]
-    API --> PG[(PostgreSQL)]
-    W[Фоновый worker] --> A[Адаптеры источников]
-    A --> EXT[Внешние API / браузерный сбор]
-    W --> PG
-    API --> CACHE[(Redis: временный кэш Inbox)]
-    API --> MSG[API переписок]
-    PG --> ARC[Дневной архив]
+ UI[React] --> API[Node HTTP API]
+ API --> DB[(PostgreSQL)]
+ WH[Validated webhook] --> W[Worker]
+ W --> DB
+ W --> A[Adapters]
+ A --> E[External APIs]
+ DB --> Archive[Campaign archive]
