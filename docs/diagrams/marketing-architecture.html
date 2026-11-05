@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<!--
+MIT License
+
+Copyright (c) 2025 Cocoon AI
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+-->
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marketing System / архитектура Architecture Diagram</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js" integrity="sha384-en/ztfPSRkGfME4KIm05joYXynqzUgbsG5nMrj/xEFAHXkeZfO3yMK8QQ+mP7p1/" crossorigin="anonymous"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background: #020617;
+      min-height: 100vh;
+      padding: 2rem;
+      color: white;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      margin-bottom: 2rem;
+    }
+    
+    .header-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .pulse-dot {
+      width: 12px;
+      height: 12px;
+      background: #22d3ee;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+    }
+    
+    .subtitle {
+      color: #94a3b8;
+      font-size: 0.875rem;
+      margin-left: 1.75rem;
+    }
+    
+    .diagram-container {
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 1rem;
+      border: 1px solid #1e293b;
+      padding: 1.5rem;
+      overflow-x: auto;
+    }
+    
+    svg {
+      width: 100%;
+      min-width: 900px;
+      display: block;
+    }
+    
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .card {
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 0.75rem;
+      border: 1px solid #1e293b;
+      padding: 1.25rem;
+    }
+    
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    .card-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    
+    .card-dot.cyan { background: #22d3ee; }
+    .card-dot.emerald { background: #34d399; }
+    .card-dot.violet { background: #a78bfa; }
+    .card-dot.amber { background: #fbbf24; }
+    .card-dot.rose { background: #fb7185; }
+    
+    .card h3 {
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    
+    .card ul {
+      list-style: none;
+      color: #94a3b8;
+      font-size: 0.75rem;
+    }
+    
+    .card li {
+      margin-bottom: 0.375rem;
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: #475569;
+      font-size: 0.75rem;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 0.5rem;
+      margin-left: auto;
+      flex-shrink: 0;
+      align-items: center;
+    }
+    .toolbar-toggle {
+      background: transparent;
+      border: none;
+      color: #475569;
+      cursor: pointer;
+      font-size: 1.25rem;
+      line-height: 1;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.375rem;
+      transition: color 0.2s, background 0.2s;
+    }
+    .toolbar-toggle:hover { color: #94a3b8; background: rgba(30, 41, 59, 0.5); }
+    .toolbar-actions {
+      display: none;
+      gap: 0.5rem;
+    }
+    .toolbar.expanded .toolbar-actions { display: flex; }
+    .toolbar-actions button {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid #334155;
+      color: #94a3b8;
+      padding: 0.375rem 0.75rem;
+      border-radius: 0.375rem;
+      font-family: inherit;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .toolbar-actions button:hover {
+      background: rgba(51, 65, 85, 0.8);
+      color: white;
+      border-color: #475569;
+    }
+
+    @media print {
+      body { background: #020617; padding: 1rem; }
+      .toolbar { display: none !important; }
+    }
+  </style>
+<style>svg{display:block;width:100%;height:auto}.pulse-dot{animation:none}h1{font-size:24px}</style></head>
+<body>
+  <div class="container" id="report-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-row">
+        <div class="pulse-dot"></div>
+        <h1>Marketing System / архитектура</h1>
+        <div class="toolbar">
+          <div class="toolbar-actions">
+            <button onclick="copyAsImage(this)">📋 Copy</button>
+            <button onclick="downloadPNG(this)">🖼️ PNG</button>
+            <button onclick="downloadPDF(this)">📄 PDF</button>
+          </div>
+          <button class="toolbar-toggle" onclick="this.parentElement.classList.toggle('expanded')" title="Export options" aria-label="Export options">⋯</button>
+        </div>
+      </div>
+      <p class="subtitle">Чтение сохранённых данных отделено от сбора и внешних API</p>
+    </div>
+
+    <!-- Main Diagram -->
+    <div class="diagram-container">
+      <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="890" viewBox="0 0 1200 890" role="img" aria-labelledby="title desc"><title id="title">Marketing System / архитектура</title><desc id="desc">Чтение сохранённых данных отделено от сбора и внешних API</desc><defs><pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#1e293b" stroke-width=".5"/></pattern><marker id="a-ui" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#22d3ee"/></marker><marker id="a-api" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#34d399"/></marker><marker id="a-data" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#a78bfa"/></marker><marker id="a-human" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#fb7185"/></marker><marker id="a-external" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#94a3b8"/></marker><marker id="a-job" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#fbbf24"/></marker></defs><rect width="1200" height="890" rx="18" fill="#020617"/><rect width="1200" height="890" rx="18" fill="url(#grid)" opacity=".55"/><g font-family="JetBrains Mono,Consolas,monospace"><text x="48" y="52" fill="#f8fafc" font-size="28" font-weight="600" text-anchor="start">Marketing System / архитектура</text><text x="48" y="82" fill="#94a3b8" font-size="16" font-weight="400" text-anchor="start">Чтение сохранённых данных отделено от сбора и внешних API</text><text x="60" y="132" fill="#94a3b8" font-size="14" font-weight="600" text-anchor="start">ВЗАИМОДЕЙСТВИЕ</text><text x="450" y="132" fill="#94a3b8" font-size="14" font-weight="600" text-anchor="start">ИСПОЛНЕНИЕ</text><text x="840" y="132" fill="#94a3b8" font-size="14" font-weight="600" text-anchor="start">ХРАНЕНИЕ</text><rect x="48" y="738" width="1104" height="78" rx="12" fill="#0f172a" stroke="#1e293b"/><text x="70" y="767" fill="#e2e8f0" font-size="16" font-weight="600" text-anchor="start">Граница ответственности</text><text x="70" y="793" fill="#94a3b8" font-size="14" font-weight="400" text-anchor="start">Кэш ускоряет повторное чтение. Свежесть и доступность источника проверяются отдельно.</text><path d="M360 212H448" fill="none" stroke="#22d3ee" stroke-width="2" stroke-linejoin="round" marker-end="url(#a-ui)"/><path d="M750 212H838" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linejoin="round" marker-end="url(#a-data)"/><path d="M450 235H405V422H362" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linejoin="round" marker-end="url(#a-external)"/><path d="M750 237H795V396H838" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linejoin="round" marker-end="url(#a-data)"/><path d="M750 448H838" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linejoin="round" marker-end="url(#a-job)"/><path d="M600 474V578" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linejoin="round" marker-end="url(#a-job)"/><path d="M450 632H362" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linejoin="round" marker-end="url(#a-external)"/><path d="M990 474V578" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linejoin="round" marker-end="url(#a-data)"/><rect x="60" y="160" width="300" height="104" rx="14" fill="#0f172a" stroke="#22d3ee" stroke-opacity=".65" stroke-width="1.5"/><rect x="76" y="180" width="4" height="64" rx="2" fill="#22d3ee"/><text x="94" y="195" fill="#f1f5f9" font-size="21" font-weight="600" text-anchor="start">Dashboard</text><text x="94" y="222" fill="#94a3b8" font-size="15" font-weight="400" text-anchor="start">React / Vite</text><rect x="450" y="160" width="300" height="104" rx="14" fill="#0f172a" stroke="#34d399" stroke-opacity=".65" stroke-width="1.5"/><rect x="466" y="180" width="4" height="64" rx="2" fill="#34d399"/><text x="484" y="195" fill="#f1f5f9" font-size="21" font-weight="600" text-anchor="start">HTTP API</text><text x="484" y="222" fill="#94a3b8" font-size="15" font-weight="400" text-anchor="start">Node.js / чтение и команды</text><rect x="840" y="160" width="300" height="104" rx="14" fill="#0f172a" stroke="#a78bfa" stroke-opacity=".65" stroke-width="1.5"/><rect x="856" y="180" width="4" height="64" rx="2" fill="#a78bfa"/><text x="874" y="195" fill="#f1f5f9" font-size="21" font-weight="600" text-anchor="start">Redis</text><text x="874" y="222" fill="#94a3b8" font-size="15" font-weight="400" text-anchor="start">Временный кэш переписок</text><rect x="60" y="370" width="300" height="104" rx="14" fill="#0f172a" stroke="#94a3b8" stroke-opacity=".65" stroke-width="1.5"/><rect x="76" y="390" width="4" height="64" rx="2" fill="#94a3b8"/><text x="94" y="405" fill="#f1f5f9" font-size="21" font-weight="600" text-anchor="start">Messaging API</text><text x="94" y="432" fill="#94a3b8" font-size="15" font-weight="400" text-anchor="start">Внешний сервис / задержки</text><rect x="450" y="370" width="300" height="104" rx="14" fill="#0f172a" stroke="#fbbf24" stroke-opacity=".65" stroke-width="1.5"/><rect x="466" y="390" width="4" height="64" rx="2" fill="#fbbf24"/><text x="484" y="405" fill="#f1f5f9" font-size="21" font-weight="600" text-anchor="start">Collector worker</text><text x="484" y="432" fill="#94a3b8" font-size="15" font-weight="400" text-anchor="start">Фоновое обновление</text><rect x="840" y="370" width="300" height="104" rx="14" fill="#0f172a" stroke="#a78bfa" stroke-opacity=".65" stroke-width="1.5"/><rect x="856" y="390" width="4" height="64" rx="2" fill="#a78bfa"/><text x="874" y="405" fill="#f1f5f9" font-size="21" font-weight="600" text-anchor="start">PostgreSQL</text><text x="874" y="432" fill="#94a3b8" font-size="15" font-weight="400" text-anchor="start">История и транзакции</text><rect x="60" y="580" width="300" height="104" rx="14" fill="#0f172a" stroke="#94a3b8" stroke-opacity=".65" stroke-width="1.5"/><rect x="76" y="600" width="4" height="64" rx="2" fill="#94a3b8"/><text x="94" y="615" fill="#f1f5f9" font-size="21" font-weight="600" text-anchor="start">Источники данных</text><text x="94" y="642" fill="#94a3b8" font-size="15" font-weight="400" text-anchor="start">REST / GraphQL</text><text x="94" y="663" fill="#94a3b8" font-size="15" font-weight="400" text-anchor="start">Браузер там, где API нет</text><rect x="450" y="580" width="300" height="104" rx="14" fill="#0f172a" stroke="#34d399" stroke-opacity=".65" stroke-width="1.5"/><rect x="466" y="600" width="4" height="64" rx="2" fill="#34d399"/><text x="484" y="615" fill="#f1f5f9" font-size="21" font-weight="600" text-anchor="start">Адаптеры</text><text x="484" y="642" fill="#94a3b8" font-size="15" font-weight="400" text-anchor="start">Нормализация и ошибки</text><text x="484" y="663" fill="#94a3b8" font-size="15" font-weight="400" text-anchor="start">Период / источник / время</text><rect x="840" y="580" width="300" height="104" rx="14" fill="#0f172a" stroke="#a78bfa" stroke-opacity=".65" stroke-width="1.5"/><rect x="856" y="600" width="4" height="64" rx="2" fill="#a78bfa"/><text x="874" y="615" fill="#f1f5f9" font-size="21" font-weight="600" text-anchor="start">Архив кампании</text><text x="874" y="642" fill="#94a3b8" font-size="15" font-weight="400" text-anchor="start">Дневные записи</text><text x="874" y="663" fill="#94a3b8" font-size="15" font-weight="400" text-anchor="start">Контекст и ограничения</text><rect x="379.8" y="183" width="50.4" height="24" rx="6" fill="#020617"/><text x="405" y="199" fill="#22d3ee" font-size="14" font-weight="400" text-anchor="middle">HTTP</text><rect x="774.1" y="183" width="41.8" height="24" rx="6" fill="#020617"/><text x="795" y="199" fill="#a78bfa" font-size="14" font-weight="400" text-anchor="middle">TTL</text><rect x="611.8" y="517" width="50.4" height="24" rx="6" fill="#020617"/><text x="637" y="533" fill="#fbbf24" font-size="14" font-weight="400" text-anchor="middle">Сбор</text><rect x="371.2" y="603" width="67.6" height="24" rx="6" fill="#020617"/><text x="405" y="619" fill="#94a3b8" font-size="14" font-weight="400" text-anchor="middle">Чтение</text><rect x="1000.5" y="517" width="59.0" height="24" rx="6" fill="#020617"/><text x="1030" y="533" fill="#a78bfa" font-size="14" font-weight="400" text-anchor="middle">Архив</text><circle cx="54" cy="856" r="5" fill="#22d3ee"/><text x="70" y="861" fill="#94a3b8" font-size="13" font-weight="400" text-anchor="start">Интерфейс</text><circle cx="256" cy="856" r="5" fill="#34d399"/><text x="272" y="861" fill="#94a3b8" font-size="13" font-weight="400" text-anchor="start">Сервис</text><circle cx="471" cy="856" r="5" fill="#a78bfa"/><text x="487" y="861" fill="#94a3b8" font-size="13" font-weight="400" text-anchor="start">Хранилище</text><circle cx="686" cy="856" r="5" fill="#fb7185"/><text x="702" y="861" fill="#94a3b8" font-size="13" font-weight="400" text-anchor="start">Решение человека</text><circle cx="891" cy="856" r="5" fill="#94a3b8"/><text x="907" y="861" fill="#94a3b8" font-size="13" font-weight="400" text-anchor="start">Внешняя система</text></g></svg>
+    </div>
+
+    <!-- Footer -->
+    <p class="footer">
+      Engineering case study · Editable SVG · Design adapted from Cocoon AI (MIT)
+    </p>
+  </div>
+
+  <script>
+    async function copyAsImage(btn) {
+      const orig = btn.textContent;
+      try {
+        const el = document.getElementById('report-container');
+        const r = el.getBoundingClientRect();
+        const pad = 32;
+        const canvas = await html2canvas(document.body, { backgroundColor: '#020617', scale: 2, useCORS: true, ignoreElements: (e) => e.classList && e.classList.contains('toolbar'), x: r.left + window.scrollX - pad, y: r.top + window.scrollY - pad, width: r.width + pad * 2, height: r.height + pad * 2 });
+        const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        btn.textContent = '✓ Copied!';
+      } catch (e) {
+        btn.textContent = '✗ Failed';
+      }
+      setTimeout(() => btn.textContent = orig, 2000);
+    }
+
+    async function downloadPNG(btn) {
+      const orig = btn.textContent;
+      btn.textContent = '⏳ ...';
+      try {
+        const el = document.getElementById('report-container');
+        const r = el.getBoundingClientRect();
+        const pad = 32;
+        const canvas = await html2canvas(document.body, { backgroundColor: '#020617', scale: 2, useCORS: true, ignoreElements: (e) => e.classList && e.classList.contains('toolbar'), x: r.left + window.scrollX - pad, y: r.top + window.scrollY - pad, width: r.width + pad * 2, height: r.height + pad * 2 });
+        const link = document.createElement('a');
+        link.download = 'diagram.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        btn.textContent = '✓ Done!';
+      } catch (e) {
+        btn.textContent = '✗ Failed';
+      }
+      setTimeout(() => btn.textContent = orig, 2000);
+    }
+
+    async function downloadPDF(btn) {
+      const orig = btn.textContent;
+      btn.textContent = '⏳ ...';
+      try {
+        const el = document.getElementById('report-container');
+        const r = el.getBoundingClientRect();
+        const pad = 32;
+        const canvas = await html2canvas(document.body, { backgroundColor: '#020617', scale: 2, useCORS: true, ignoreElements: (e) => e.classList && e.classList.contains('toolbar'), x: r.left + window.scrollX - pad, y: r.top + window.scrollY - pad, width: r.width + pad * 2, height: r.height + pad * 2 });
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const orientation = canvas.width > canvas.height ? 'landscape' : 'portrait';
+        const pdf = new jsPDF({ orientation, unit: 'px', format: [canvas.width, canvas.height], hotfixes: ['px_scaling'] });
+        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+        pdf.save('diagram.pdf');
+        btn.textContent = '✓ Done!';
+      } catch (e) {
+        btn.textContent = '✗ Failed';
+      }
+      setTimeout(() => btn.textContent = orig, 2000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+sequenceDiagram
+    actor User as Пользователь
+    participant UI as Интерфейс
+    participant API as Node API
+    participant Cache as Redis
+    participant Meta as Внешний API
+    User->>UI: Открыть диалог
+    UI->>API: Запрос сообщений
+    API->>Cache: Проверить кэш и область токена
+    alt Есть допустимый снимок
+        Cache-->>API: Данные и время наблюдения
+        API-->>UI: Показать сохранённое
+        opt Снимок требует обновления
+            UI->>API: Запрос свежего снимка
+            API->>Meta: Прочитать сообщения
+            Meta-->>API: Ответ
+            API->>Cache: Обновить TTL
+            API-->>UI: Свежие данные
+        end
+    else Кэш отсутствует
+        API->>Meta: Прочитать сообщения
+        Meta-->>API: Ответ
+        API-->>UI: Данные либо явная ошибка
+    end

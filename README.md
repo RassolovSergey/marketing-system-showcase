@@ -25,6 +25,13 @@
 
 ## Архитектура и границы ответственности
 
+![Marketing System / архитектура](docs/diagrams/marketing-architecture.svg)
+
+<details>
+<summary>Исходник Mermaid и HTML для экспорта</summary>
+
+[HTML с экспортом PNG/PDF](docs/diagrams/marketing-architecture.html) · [Mermaid](docs/diagrams/marketing-architecture.mmd)
+
 ```mermaid
 flowchart LR
     U[Владелец] --> UI[React / Vite]
@@ -38,9 +45,18 @@ flowchart LR
     PG --> ARC[Дневной архив]
 ```
 
+</details>
+
 Docker Compose запускает web, worker, PostgreSQL и Redis. Бизнес-история хранится в PostgreSQL; кэш переписок не является её заменой. Браузерный сбор применяется там, где нет подходящего доступного API, и остаётся источником с отдельными рисками блокировки и полноты.
 
 ### Последовательность чтения переписки
+
+![Inbox / быстрый и свежий пути](docs/diagrams/inbox-sequence.svg)
+
+<details>
+<summary>Исходник Mermaid и HTML для экспорта</summary>
+
+[HTML с экспортом PNG/PDF](docs/diagrams/inbox-sequence.html) · [Mermaid](docs/diagrams/inbox-sequence.mmd)
 
 ```mermaid
 sequenceDiagram
@@ -68,6 +84,8 @@ sequenceDiagram
         API-->>UI: Данные либо явная ошибка
     end
 ```
+
+</details>
 
 Важная граница: кэш ускоряет чтение, но не выдаёт разрешения на отправку. Проверка доступа и допустимости ответа выполняется отдельным путём. Webhooks пока не объявляются работающей интеграцией.
 
