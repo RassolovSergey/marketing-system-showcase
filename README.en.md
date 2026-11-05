@@ -29,7 +29,7 @@ This complicates daily decisions and campaign reviews. A collection failure can 
 
 ## Architecture
 
-![Marketing System architecture, Russian labels](docs/diagrams/marketing-architecture.svg)
+![Marketing System architecture](docs/diagrams/marketing-architecture.en.svg)
 
 The React UI calls a Node.js API. PostgreSQL stores business history and the latest conversation snapshots. A separate worker refreshes source data. Docker Compose provides local deployment.
 
@@ -39,7 +39,7 @@ Meta webhooks trigger refreshes ahead of the next visit. The public receiver is 
 
 The first implementation waited for Meta when opening a conversation. Redis improved repeat reads, but cold requests and expired entries still depended on the provider. Snapshots were then moved to PostgreSQL and refreshes moved into background processing. This reduced infrastructure components and preserved loaded messages across restarts.
 
-![Conversation read and refresh, Russian labels](docs/diagrams/inbox-sequence.svg)
+![Conversation read and refresh](docs/diagrams/inbox-sequence.en.svg)
 
 Bulk preloading exposed another constraint: provider rate limits. Collection now uses small batches and a shared cooldown after throttling. Saved conversations remain available. Complete preloading of all historical conversations is not claimed.
 
